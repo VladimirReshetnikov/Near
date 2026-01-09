@@ -9,6 +9,8 @@ public static class ServiceCollectionExtensions
     public static IServiceCollection AddNearInfrastructure(this IServiceCollection services)
     {
         services.AddSingleton<IGitProcessRunner, GitProcessRunner>();
+        services.AddSingleton<IGitRepoLocator, GitRepoLocator>();
+        services.AddSingleton<IGitQueryService, GitQueryService>();
 
         return services;
     }

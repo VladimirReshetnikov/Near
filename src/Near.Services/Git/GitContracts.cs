@@ -8,7 +8,8 @@ namespace Near.Services.Git;
 public sealed record DiffRequest(
     string RepoRoot,
     string? Path,
-    DiffTarget Target
+    DiffTarget Target,
+    string? Reference = null
 );
 
 public enum DiffTarget
