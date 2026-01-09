@@ -38,6 +38,38 @@ The app runs entirely in a terminal window and uses **Terminal.Gui (v2)** for a 
 * **Customizable**: configurable layout, panels, key bindings, and key chords.
 * **Cross-platform**: Windows + Linux + macOS (with platform-specific terminal backends where needed).
 
+### 2.3 Repository + solution structure (initial scaffolding)
+
+The repository starts with a minimal, layered solution layout so future implementation work can drop into predictable modules.
+
+* **Root**
+  * `Near.sln` for solution-wide builds.
+  * `Spec.md` (this document).
+  * `.gitignore` for build outputs and IDE artifacts.
+* **src/Near.App**
+  * Console entry point and composition root.
+  * Responsible for wiring DI, configuration, and bootstrapping the UI host.
+* **src/Near.Core**
+  * Domain models, commands, state types, and pure logic with no UI dependencies.
+* **src/Near.Services**
+  * Application services and orchestration (background tasks, coordination between core + infrastructure).
+* **src/Near.Infrastructure**
+  * External integrations (filesystem, git CLI, terminal backends, config persistence).
+* **src/Near.UI**
+  * Terminal.Gui views, panels, layout, and input routing.
+
+> Note: This scaffolding is intentionally light. We are **not** implementing features yet; only setting up structure.
+
+### 2.4 Local build + run (placeholder)
+
+These commands will become usable once the implementation arrives and the .NET SDK is installed.
+
+* Build: `dotnet build Near.sln`
+* Run: `dotnet run --project src/Near.App`
+* Tests (when added): `dotnet test`
+
+Terminal.Gui apps generally require a real terminal (not a redirected/embedded console).
+
 ---
 
 ## 3. Guiding Principles
@@ -127,6 +159,15 @@ The app runs entirely in a terminal window and uses **Terminal.Gui (v2)** for a 
 * When panels are hidden: terminal expands to fill available space (“panels off”)
 * Option to synchronize terminal working directory with active file panel (off by default)
 * Command to send paths/selections to terminal (paste path, `cd`, etc.)
+
+### 4.5 Explicit non-goals for the initial scaffold
+
+To keep this phase focused on structure and documentation, the following are **not** part of the initial scaffold: 
+
+* Functional file operations, git commands, or terminal emulation.
+* UI rendering beyond placeholder startup.
+* Persistence of settings, bookmarks, or layout.
+* Tests and benchmarks (they will be introduced once concrete implementations exist).
 
 ---
 
@@ -296,22 +337,32 @@ We use a clean architecture style:
    * input routing → command dispatcher
    * rendering and layout
 
-### 7.2 Project structure (suggested)
+### 7.2 Project structure (scaffolded)
 
-* `App/` (entry point, host, composition root)
-* `Core/`
+The solution is structured as multiple SDK-style projects under `src/` to keep dependencies directional and clear.
 
-  * `Models/`, `Commands/`, `State/`, `Utilities/`
-* `Services/`
+* `src/Near.App/` (entry point, host, composition root)
+* `src/Near.Core/`
 
-  * `FileOperations/`, `Git/`, `Search/`, `Tasks/`
-* `Infrastructure/`
+  * `Models/`, `Commands/`, `State/`, `Utilities/` (domain + pure logic)
+* `src/Near.Services/`
 
-  * `FileSystem/`, `GitCli/`, `Terminal/`, `Config/`, `Logging/`
-* `UI/`
+  * `FileOperations/`, `Git/`, `Search/`, `Tasks/` (application orchestration)
+* `src/Near.Infrastructure/`
 
-  * `Panels/`, `Layout/`, `Input/`, `Views/`, `Theming/`
-* `Plugins/` (optional later)
+  * `FileSystem/`, `GitCli/`, `Terminal/`, `Config/`, `Logging/` (external adapters)
+* `src/Near.UI/`
+
+  * `Panels/`, `Layout/`, `Input/`, `Views/`, `Theming/` (Terminal.Gui-based UI)
+* `src/Plugins/` (optional later)
+
+Dependency intent (high level):
+
+* **Near.Core** has no dependencies on other projects.
+* **Near.Services** depends on Core.
+* **Near.Infrastructure** depends on Core.
+* **Near.UI** depends on Core + Services.
+* **Near.App** depends on all other projects and wires them together.
 
 ### 7.3 Dependency injection and hosting
 
